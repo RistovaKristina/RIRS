@@ -2,13 +2,13 @@ const request = require('supertest');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const groupRouter = require('../routes/groupRouter'); // Adjust the path as needed
-import groupService from '../services/groupService';
+const GroupService = require("../services/GroupService");
 
 jest.mock('../services/groupService'); // Mock the service
 
 const app = express();
 app.use(express.json());
-app.use('/groups', groupRouter);
+app.use('/groups', GroupService);
 
 const JWT_SECRET = 'Vkm123vkm$$$';
 const token = jwt.sign({ userId: '123' }, JWT_SECRET);
@@ -21,7 +21,7 @@ const mockGroup = {
 
 describe('Group Router', () => {
   test('GET /groups - Should fetch all groups', async () => {
-    groupService.getGroups.mockResolvedValueOnce([mockGroup]);
+    GroupService.getGroups.mockResolvedValueOnce([mockGroup]);
 
     const response = await request(app)
       .get('/groups')
@@ -32,7 +32,7 @@ describe('Group Router', () => {
   });
 
   test('DELETE /groups/:id - Should delete a group', async () => {
-    groupService.mockImplementation(() => ({
+    GroupService.mockImplementation(() => ({
       deleteGroup: jest.fn().mockResolvedValueOnce(true),
     }));
 
