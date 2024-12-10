@@ -1,0 +1,68 @@
+name: Run Tests with Coverage Reports
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  frontend-tests:
+    name: Run Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js for Frontend
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20 # Node.js version for frontend
+
+      - name: Install Dependencies
+        run: |
+          cd front
+          npm install
+
+      - name: Run Frontend Tests with Coverage
+        run: |
+          cd front
+          npm test -- --coverage
+
+      - name: Upload Frontend Coverage Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: front-coverage
+          path: front/coverage # Path to the coverage report
+
+  backend-tests:
+    name: Run Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js for Backend
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20 # Node.js version for backend
+
+      - name: Install Dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Run Backend Tests with Coverage
+        run: |
+          cd backend
+          npm test -- --coverage
+
+      - name: Upload Backend Coverage Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-coverage
+          path: backend/coverage # Path to the coverage report
