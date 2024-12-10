@@ -27,7 +27,7 @@ jobs:
 
       - name: Run Tests
         working-directory: ./front
-        run: npm test -- --coverage  # Add the run key for running tests
+        run: npm test -- --coverage  # Add the run key for running tests hh
 
       - name: Upload Coverage Report
         if: success()
