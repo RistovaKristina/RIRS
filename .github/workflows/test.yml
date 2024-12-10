@@ -1,4 +1,4 @@
-name: Run Tests with Coverage Reports
+name: CI Workflow
 
 on:
   push:
@@ -12,57 +12,51 @@ jobs:
   frontend-tests:
     name: Run Frontend Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js for Frontend
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20 # Node.js version for frontend
+          node-version: 22
 
       - name: Install Dependencies
-        run: |
-          cd front
-          npm install
+        working-directory: ./front
+        run: npm install
 
-      - name: Run Frontend Tests with Coverage
-        run: |
-          cd front
-          npm test -- --coverage
-
-      - name: Upload Frontend Coverage Report
+      - name: Run Tests
+        working-directory: ./front
+      - name: Upload Coverage Report
+        if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: front-coverage
-          path: front/coverage # Path to the coverage report
+          name: front-coverage-report
+          path: ./front/coverage
 
   backend-tests:
     name: Run Backend Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js for Backend
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20 # Node.js version for backend
+          node-version: 22
 
       - name: Install Dependencies
-        run: |
-          cd backend
-          npm install
+        working-directory: ./backend
+        run: npm install
 
-      - name: Run Backend Tests with Coverage
-        run: |
-          cd backend
-          npm test -- --coverage
+      - name: Run Tests
+        working-directory: ./backend
+        run: npm test -- --coverage
 
-      - name: Upload Backend Coverage Report
+      - name: Upload Coverage Report
+        if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: backend-coverage
-          path: backend/coverage # Path to the coverage report
+          name: backend-coverage-report
+          path: ./backend/coverage
