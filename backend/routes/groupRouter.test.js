@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const groupRouter = require('../routes/groupRouter'); // Adjust the path as needed
 const GroupService = require('../services/groupService');
 
-jest.mock('../services/GroupService'); // Mock the service
+jest.mock('../services/groupService'); // Mock the service
 
 const app = express();
 app.use(express.json());
