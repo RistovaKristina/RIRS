@@ -49,6 +49,6 @@ describe('Group Router', () => {
     expect(response.status).toBe(401);
     expect(response.body.message).toBe('Access token required');
   });
-  console.log(require.resolve('../services/groupService'));
+  console.log(require.resolve('../services/GroupService'));
 
 });
