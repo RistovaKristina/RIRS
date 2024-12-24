@@ -1,5 +1,7 @@
-name: CI Workflow
+# Ime pipeline-a za backend
+name: Backend CI
 
+# Dogodki, ki sprožijo workflow (push in pull request na glavno vejo)
 on:
   push:
     branches:
@@ -9,56 +11,82 @@ on:
       - main
 
 jobs:
-  frontend-tests:
-    name: Run Frontend Tests
+  # Job za gradnjo backenda
+  build-backend:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - name: Checkout code  # Kloniranje repozitorija
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
+    - name: Setup Node.js  # Namestitev Node.js okolja
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
 
-      - name: Install Dependencies
-        working-directory: ./front
-        run: npm install
+    - name: Cache node_modules  # Caching odvisnosti
+      uses: actions/cache@v3
+      with:
+        path: ./backend/node_modules  # Pot do mape node_modules
+        key: ${{ runner.os }}-backend-${{ hashFiles('./backend/package-lock.json') }}  # Ključ za cache
+        restore-keys: |
+          ${{ runner.os }}-backend-
+      # ⚠️ Caching:
+      # - Če cache obstaja (cache hit), se node_modules obnovi, preden se zažene npm install.
+      # - Če cache ne obstaja (cache miss), npm install ponovno ustvari mapo node_modules.
 
-      - name: Run Tests
-        working-directory: ./front
-        run: npm test -- --coverage  # Add the run key for running tests hh
+    - name: Install dependencies  # Namestitev odvisnosti
+      run: |
+        cd ./backend
+        npm ci
 
-      - name: Upload Coverage Report
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: front-coverage-report
-          path: ./front/coverage
+    - name: Upload backend artifacts  # Naložitev artefaktov za backend
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-build  # Ime artefakta
+        path: |
+          ./backend/ 
+          ./backend/node_modules/  
+        # Pot do celotne kode
+        # Nameščene odvisnosti
 
-  backend-tests:
-    name: Run Backend Tests
+  # Job za testiranje backenda
+  test-backend:
+    needs: build-backend  # Testiranje se izvede po uspešni gradnji
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - name: Checkout code  # Kloniranje repozitorija
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
+    - name: Setup Node.js  # Namestitev Node.js okolja
+      uses: actions/setup-node@v3
+      with:
+        node-version: 22
 
-      - name: Install Dependencies
-        working-directory: ./backend
-        run: npm install
+    - name: Cache node_modules  # Caching odvisnosti
+      uses: actions/cache@v3
+      with:
+        path: ./backend/node_modules  # Pot do mape node_modules
+        key: ${{ runner.os }}-backend-${{ hashFiles('./backend/package-lock.json') }}  # Ključ za cache
+        restore-keys: |
+          ${{ runner.os }}-backend-
 
-      - name: Run Tests
-        working-directory: ./backend
-        run: npm test -- --coverage
+    - name: Install dependencies  # Namestitev odvisnosti
+      run: |
+        cd ./backend
+        npm install
+      # ⚠️ Cache hit:
+      # - Če je cache hit, npm install preveri obstoječe odvisnosti in ne namešča ničesar dodatnega.
+      # - Če je cache miss, npm install ponovno ustvari mapo node_modules.
 
-      - name: Upload Coverage Report
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: backend-coverage-report
-          path: ./backend/coverage
+    - name: Run tests with coverage  # Izvajanje testov s pokritostjo
+      run: |
+        cd ./backend
+        npm test -- --coverage
+
+    - name: Upload coverage report  # Naložitev poročila o pokritosti kode
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-coverage  # Ime artefakta
+        path: ./backend/coverage/  # Pot do poročila o pokritosti kode

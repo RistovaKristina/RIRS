@@ -1,10 +1,10 @@
 const request = require('supertest');
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const expenseRouter = require('../routes/expenseRouter'); // Path to your router
-const ExpenseService = require('../services/ExpensesService'); // Mocking the service
+const expenseRouter = require('../routes/expenseRouter'); 
+const ExpenseService = require('../services/ExpensesService'); 
 
-jest.mock('../services/ExpensesService'); // Mock the service
+jest.mock('../services/ExpensesService'); 
 
 const JWT_SECRET = 'Vkm123vkm$$$';
 
