@@ -1,4 +1,4 @@
-# Ime pipeline-a za backend plsaj
+# Ime pipeline-a za backend plsajde
 name: Backend CI
 
 # Dogodki, ki sprožijo workflow (push in pull request na glavno vejo)

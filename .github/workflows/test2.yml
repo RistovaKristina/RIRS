@@ -11,7 +11,7 @@ on:
       - production
 
 jobs:
-  # Gradnja frontenda plsaaaj
+  # Gradnja frontenda plsaaajde
   build-frontend:
     runs-on: ubuntu-latest
 
